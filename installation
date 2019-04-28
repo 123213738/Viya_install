@@ -1,0 +1,242 @@
+```bash
+[root@viya1 sas]#  md5sum viya34.tar
+7d56ce54ec08edd4aff440b854a180ae  viya34.tar
+7d56ce54ec08edd4aff440b854a180ae  viya34.tar
+7d56ce54ec08edd4aff440b854a180ae  viya34.tar
+
+检查LDAP服务器
+检查NFS
+检查postgresql端口是否被占用5432
+检查inventory.ini文件是否正确
+ps -ef|grep ldap
+sudo du -d 1 -m /opt/sas
+
+ansible-playbook deploy-cleanup.yml
+
+ps -ef |grep -v grep |grep 'sasrabb' | awk '{system("sudo kill -9 "$2);}'
+ps -ef |grep -v grep |grep 'rabbitmq' | awk '{system("sudo kill -9 "$2);}'
+ps -ef |grep -v grep |grep '/opt/sas/viya/' | awk '{system("sudo kill -9 "$2);}'
+ps -ef |grep -v grep |grep 'sas' | awk '{system("sudo kill -9 "$2);}'
+ps -ef |grep sas
+
+rm -rf /opt/sas/viya_*
+rm -rf /opt/sas/spre_*
+
+--Just for primary cascontrol+secondary cascontrol
+
+mount eeclxvm127:/data/nas /nas
+
+mkdir -p /nas/cascontrol
+sudo mkdir -p /opt/sas/viya/config/data
+ln -s /nas/cascontrol /opt/sas/viya/config/data/cas
+sudo chown -R sas:sas /opt/sas/viya/config/data/cas
+sudo chmod -R 755 /opt/sas/viya/config/data/cas
+sudo chown -R sas:sas /opt/sas/viya
+cd /opt/sas/viya/config/data
+sudo chmod -R 777 /nas/cascontrol
+ll
+
+
+5432-----5532
+cp /nas/sitedefault.yml   /sas/sas_viya_playbook/roles/consul/files/
+
+172.19.48.188 viya01.sas.spdl.com    viya01
+172.19.48.189 viya02.sas.spdl.com    viya02
+ 
+vi ha3.ini
+viya01 ansible_host=viya01.sas.spdl.com ansible_user=sas ansible_ssh_private_key_file=~/.ssh/id_rsa consul_bind_adapter=eth0
+viya02 ansible_host=viya02.sas.spdl.com ansible_user=sas ansible_ssh_private_key_file=~/.ssh/id_rsa consul_bind_adapter=eth0
+
+
+--var.yml
+DEPLOYMENT_LABEL: "ixinwu-viya34-ha3"
+
+# Multiple invocation definitions
+# The machine reference (with deployTarget as the default) must be enclosed
+# in quotes if it is set to a value that starts with a number.
+INVOCATION_VARIABLES:
+  viyadev01:
+    pgpoolc:
+    - PCP_PORT: '5430'
+      PGPOOL_PORT: '5431'
+      SANMOUNT: '{{ SAS_CONFIG_ROOT }}/data/sasdatasvrc'
+      SERVICE_NAME: postgres
+    sasdatasvrc:
+    - NODE_NUMBER: '0'
+      NODE_TYPE: P
+      PG_PORT: '5532'
+      SANMOUNT: '{{ SAS_CONFIG_ROOT }}/data/sasdatasvrc'
+      SERVICE_NAME: postgres
+  viyadev02:
+    sasdatasvrc:
+    - NODE_NUMBER: '1'
+      NODE_TYPE: S
+      PG_PORT: '5532'
+      SANMOUNT: '{{ SAS_CONFIG_ROOT }}/data/sasdatasvrc'
+      SERVICE_NAME: postgres
+  viyadev03:
+    sasdatasvrc:
+    - NODE_NUMBER: '2'
+      NODE_TYPE: S
+      PG_PORT: '5532'
+      SANMOUNT: '{{ SAS_CONFIG_ROOT }}/data/sasdatasvrc'
+      SERVICE_NAME: postgres
+
+STUDIO_CONFIGURATION:
+init:
+#sasstudio.appserver.port_comment: '# Port that Studio is listening on'
+#sasstudio.appserver.port: 7080
+#sasstudio.appserver.https.port: 7443
+#webdms.workspaceServer.hostName: localhost
+#webdms.workspaceServer.port: 8591
+webdms.showSystemRoot: false  
+
+#SASV9_CONFIGURATION:
+  1: '/* set SASWORK to the right location */'
+  2: 'WORK=/data/saswork'
+
+sudo mkdir -p /data/saswork
+sudo chmod -R 777 /data/saswork	  
+
+cd /sas/sas_viya_playbook
+ansible-playbook system-assessment.yml
+time ansible-playbook site.yml
+
+---configure sharedVault in the Backup Service
+
+
+sudo /etc/init.d/sas-viya-all-services status
+sudo /etc/init.d/sas-viya-connect-default start
+sudo /etc/init.d/sas-viya-sasstudio-default start
+sudo /etc/init.d/sas-viya-spawner-default  start
+
+
+cas casauto;
+cas casauto listabout;
+
+
+TASK [sas-instructions : Move debug info to /sas/sas_viya_playbook/snapshot/1532870847] ********************************************************************
+changed: [eeclxvm124 -> localhost]
+
+PLAY RECAP *************************************************************************************************************************************************
+eeclxvm124                 : ok=2164 changed=1296 unreachable=0    failed=0   
+eeclxvm125                 : ok=1254 changed=588  unreachable=0    failed=0   
+eeclxvm126                 : ok=1253 changed=588  unreachable=0    failed=0   
+localhost                  : ok=14   changed=1    unreachable=0    failed=0   
+
+
+real    154m29.186s
+user    109m1.124s
+sys     24m27.441s
+
+---sasboot
+cd /var/log/sas/viya/saslogon/default
+grep 'sasboot' sas-saslogon*
+https://eeclxvm124/SASLogon/reset_password?code=2T4550AQ27
+cd ~/sas_viya_playbook
+
+ansible httpproxy -m shell -a 'host=`hostname -f` ; cat /etc/httpd/conf.d/proxy.conf | grep ProxyPass | grep -e '/SAS' -e 'shared' | awk  "{print \$2}" | sort | uniq  | sed "s/^/https:\/\/"$host"/" ' | sed "s/int/sas/" | tee urls.txt
+
+https://eeclxvm124.unx.sas.com/cas-shared-default-http/
+https://eeclxvm124.unx.sas.com/SASBackupManager/
+https://eeclxvm124.unx.sas.com/SASDataExplorer/
+https://eeclxvm124.unx.sas.com/SASDataStudio/
+https://eeclxvm124.unx.sas.com/SASDecisionManager/
+https://eeclxvm124.unx.sas.com/SASDrive/
+https://eeclxvm124.unx.sas.com/SASEnvironmentManager/
+https://eeclxvm124.unx.sas.com/SASEventStreamManager/
+https://eeclxvm124.unx.sas.com/SASEventStreamProcessingStudio/
+https://eeclxvm124.unx.sas.com/SASGraphBuilder/
+https://eeclxvm124.unx.sas.com/SASJobExecution/
+https://eeclxvm124.unx.sas.com/SASLineage/
+https://eeclxvm124.unx.sas.com/SASLogon/
+https://eeclxvm124.unx.sas.com/SASModelManager/
+https://eeclxvm124.unx.sas.com/SASPlanning/
+https://eeclxvm124.unx.sas.com/SASQKBManager/
+https://eeclxvm124.unx.sas.com/SASReportViewer/
+https://eeclxvm124.unx.sas.com/SASStudio/
+https://eeclxvm124.unx.sas.com/SASStudioV/
+https://eeclxvm124.unx.sas.com/SASThemeDesigner/
+https://eeclxvm124.unx.sas.com/SASVisualAnalytics/
+https://eeclxvm124.unx.sas.com/SASWorkflowManager/
+eeclxvm125 | SUCCESS | rc=0 >>
+https://eeclxvm125.unx.sas.com/cas-shared-default-http/
+https://eeclxvm125.unx.sas.com/SASBackupManager/
+https://eeclxvm125.unx.sas.com/SASDataExplorer/
+https://eeclxvm125.unx.sas.com/SASDataStudio/
+https://eeclxvm125.unx.sas.com/SASDecisionManager/
+https://eeclxvm125.unx.sas.com/SASDrive/
+https://eeclxvm125.unx.sas.com/SASEnvironmentManager/
+https://eeclxvm125.unx.sas.com/SASEventStreamManager/
+https://eeclxvm125.unx.sas.com/SASEventStreamProcessingStudio/
+https://eeclxvm125.unx.sas.com/SASGraphBuilder/
+https://eeclxvm125.unx.sas.com/SASJobExecution/
+https://eeclxvm125.unx.sas.com/SASLineage/
+https://eeclxvm125.unx.sas.com/SASLogon/
+https://eeclxvm125.unx.sas.com/SASModelManager/
+https://eeclxvm125.unx.sas.com/SASPlanning/
+https://eeclxvm125.unx.sas.com/SASQKBManager/
+https://eeclxvm125.unx.sas.com/SASReportViewer/
+https://eeclxvm125.unx.sas.com/SASStudio/
+https://eeclxvm125.unx.sas.com/SASStudioV/
+https://eeclxvm125.unx.sas.com/SASThemeDesigner/
+https://eeclxvm125.unx.sas.com/SASVisualAnalytics/
+https://eeclxvm125.unx.sas.com/SASWorkflowManager/
+eeclxvm126 | SUCCESS | rc=0 >>
+https://eeclxvm126.unx.sas.com/cas-shared-default-http/
+https://eeclxvm126.unx.sas.com/SASBackupManager/
+https://eeclxvm126.unx.sas.com/SASDataExplorer/
+https://eeclxvm126.unx.sas.com/SASDataStudio/
+https://eeclxvm126.unx.sas.com/SASDecisionManager/
+https://eeclxvm126.unx.sas.com/SASDrive/
+https://eeclxvm126.unx.sas.com/SASEnvironmentManager/
+https://eeclxvm126.unx.sas.com/SASEventStreamManager/
+https://eeclxvm126.unx.sas.com/SASEventStreamProcessingStudio/
+https://eeclxvm126.unx.sas.com/SASGraphBuilder/
+https://eeclxvm126.unx.sas.com/SASJobExecution/
+https://eeclxvm126.unx.sas.com/SASLineage/
+https://eeclxvm126.unx.sas.com/SASLogon/
+https://eeclxvm126.unx.sas.com/SASModelManager/
+https://eeclxvm126.unx.sas.com/SASPlanning/
+https://eeclxvm126.unx.sas.com/SASQKBManager/
+https://eeclxvm126.unx.sas.com/SASReportViewer/
+https://eeclxvm126.unx.sas.com/SASStudio/
+https://eeclxvm126.unx.sas.com/SASStudioV/
+https://eeclxvm126.unx.sas.com/SASThemeDesigner/
+https://eeclxvm126.unx.sas.com/SASVisualAnalytics/
+https://eeclxvm126.unx.sas.com/SASWorkflowManager/
+
+
+sha1:8e7709491308:c1ac530254f1ea8fe86954be75729185994ba5f4
+
+c.NotebookApp.ip = '10.36.14.154'
+c.NotebookApp.password = 'sha1:8e7709491308:c1ac530254f1ea8fe86954be75729185994ba5f4'
+c.NotebookApp.open_browser = False
+c.NotebookApp.port = 8888
+
+
+
+from swat import *   #导入swat包，sas开发，体现了sas viya的开放性
+%matplotlib inline
+import numpy as np
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+
+# import sys
+# sys.path.append('../DL_APIs1109')
+from dlpy import Model, Sequential       
+from dlpy.layers import *                #定义深度学习的层
+from dlpy.applications import *          #dlpy的一些应用
+from dlpy.utils import *
+from dlpy.images import ImageTable       #引入图像模块
+from dlpy.splitting import two_way_split  #将数据分割为训练集和数据集
+s = CAS('eeclxvm124', 5570, 'viyaadmin', 'sas12345')     
+print (s)
+s.sessionstatus()
+s.serverstatus()
+
+
+export CAS_CLIENT_SSL_CA_LIST=/opt/sas/viya/config/etc/SASSecurityCertificateFramework/cacerts/trustedcerts.pem
+
+an error occurred requesting the cas management service
+```
