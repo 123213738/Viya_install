@@ -1,0 +1,159 @@
+```bash
+cat << 'EOF' > /etc/hosts
+172.19.48.188 viya01.sas.spdl.com    viya01
+172.19.48.189 viya02.sas.spdl.com    viya02
+127.0.0.1   localhost
+EOF
+more /etc/hosts
+
+for c in     viya01.sas.spdl.com viya02.sas.spdl.com; 
+do scp /etc/hosts $c:/etc/hosts;
+done
+---
+vi /etc/hostname 
+---
+cat << 'EOF' >> /etc/ssh/sshd_config
+MaxStartups 100:30:100
+EOF
+more /etc/ssh/sshd_config|grep MaxStartups
+-----
+cat << 'EOF' >> /etc/security/limits.conf
+* - nofile 150000
+EOF
+more /etc/security/limits.conf
+----
+cat << 'EOF' >> /etc/security/limits.d/20-nproc.conf 
+* - nproc 100000
+EOF
+more /etc/security/limits.d/20-nproc.conf 
+----
+cat << 'EOF' >> /etc/sysctl.conf
+kernel.sem=512 32000 256 1024
+net.core.somaxconn=2048
+EOF
+more /etc/sysctl.conf
+---
+sudo sysctl -p
+-----
+cat << 'EOF' >> /etc/systemd/system.conf
+DefaultTimeoutStartSec=1800s
+DefaultTimeoutStopSec=1800s
+EOF
+more /etc/systemd/system.conf
+---
+md5sum repomirror.tar.gz 
+30242342532 Jun 27 00:59 repomirror.tar.gz
+9ad0f39c5ebfbb58c865b34eadae7c23  repomirror.tar.gz
+9ad0f39c5ebfbb58c865b34eadae7c23  repomirror.tar.gz
+--
+#tmux kill-server
+tmux ls
+tmux a -t 0
+                                                                    
+[root@localhost ~]# blkid
+/dev/vdb: UUID="1f99de96-2e39-45f6-9110-dab99dc5e56e" TYPE="ext4"
+
+vi /etc/fstab
+UUID=1ae29f2c-8c2a-48bd-8230-236198741293  /opt                       ext4    defaults        1 2
+
+
+--磁盘挂载
+chmod -R 777 /opt
+mkfs.ext4 /dev/vdb
+mount /dev/vdb /opt
+
+---vncserver
+yum install libglvnd-glx
+sudo yum groupinstall -y "X Window System"
+sudo yum install -y gnome-classic-session gnome-terminal nautilus-open-terminal control-center
+sudo yum install -y tigervnc-server
+sudo yum install -y firefox
+sudo yum install -y tmux
+yum -y install gcc glibc  libXp libXmu net-tools numactl openmotif xterm gcc boost  libstdc++ libgcc
+sudo rpm -ivh /nas/jdk-8u131-linux-x64.rpm
+
+vncserver -kill :1
+vncserver
+sas12345
+----
+yum groupinstall "fonts" -y
+/etc/locale.conf
+LANG="en_US.UTF-8"
+
+---关闭SELinux
+sudo sed -i.bak -e 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
+more /etc/selinux/config
+--
+sudo setenforce 0
+--关闭iptables,防火墙
+sudo systemctl stop iptables.service
+sudo systemctl disable iptables.service
+sudo systemctl stop ip6tables.service
+sudo systemctl disable ip6tables.service
+sudo systemctl stop firewalld.service
+sudo systemctl disable firewalld.service
+--nfs server
+sudo yum install -y rpc-bind nfs-utils
+
+echo "/data/nas/ *(rw,sync,no_root_squash)">/etc/exports
+exportfs -rv
+
+sudo systemctl restart rpcbind
+sudo systemctl restart nfs-server
+sudo systemctl enable rpcbind
+sudo systemctl enable nfs-server
+sudo exportfs
+---client
+sudo yum install nfs-utils -y 
+sudo systemctl enable rpcbind
+sudo systemctl start rpcbind
+
+sudo vi /etc/fstab
+172.19.48.188:/data/nas/ /nas              nfs     nolock          0 0
+
+sudo umount 172.19.48.188:/data/nas/
+sudo mount 172.19.48.188:/data/nas/ /nas 
+
+	
+--Enable a Shared File System,the shared file system should reside on a machine other than the primary CAS controller or the secondary CAS controller
+mkdir -p /nas/cascontrol
+
+--[sas-casserver-primary]
+viya01
+[sas-casserver-secondary]
+viya02
+
+sudo mkdir -p /opt/sas/viya/config/data
+ln -s /nas/cascontrol /opt/sas/viya/config/data/cas
+sudo chown -R sas:sas /opt/sas/viya/config/data/cas
+sudo chmod -R 755 /opt/sas/viya/config/data/cas
+sudo chown -R sas:sas /opt/sas/viya
+---
+su - sas
+---predeployment
+hostname -s
+hostname
+hostname -f
+
+------install ansible
+rpm -qa | grep systemd
+sudo yum update systemd -y
+--
+-epel
+sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+sudo yum repolist
+
+sudo yum install -y python python-setuptools python-devel openssl-devel
+sudo yum install -y python-pip gcc wget automake libffi-devel python-six
+
+yum install -y --downloadonly python-pip
+
+yum install -y --downloadonly --downloaddir=/mnt/anaconda python-pip
+pip download -d /mnt/anaconda ansible==2.4.2
+
+sudo pip install --upgrade pip setuptools
+
+sudo pip install ansible==2.4.2
+--
+ansible --version
+```
