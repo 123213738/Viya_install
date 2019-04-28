@@ -1,0 +1,120 @@
+```bash
+sudo du -d 1 -m /opt/sas
+cd /sas/sas_viya_playbook/
+time ansible-playbook deploy-cleanup.yml 
+
+clear
+ps -ef |grep -v grep |grep 'sasrabb' | awk '{system("sudo kill -9 "$2);}'
+ps -ef |grep -v grep |grep 'rabbitmq' | awk '{system("sudo kill -9 "$2);}'
+ps -ef |grep -v grep |grep '/opt/sas/viya/' | awk '{system("sudo kill -9 "$2);}'
+ps -ef |grep sas
+
+
+ps -ef |grep -v grep |grep 'sas' | awk '{system("sudo kill -9 "$2);}'
+
+ps -ef|grep httpd| awk '{system("sudo kill -9 "$2);}'
+
+
+reboot -f
+
+--Just for viya01+viya02
+mkdir -p /nas/cascontrol
+sudo mkdir -p /opt/sas/viya/config/data
+ln -s /nas/cascontrol /opt/sas/viya/config/data/cas
+sudo chown -R sas:sas /opt/sas/viya/config/data/cas
+sudo chmod -R 755 /opt/sas/viya/config/data/cas
+sudo chown -R sas:sas /opt/sas/viya
+cd /opt/sas/viya/config/data
+sudo chmod -R 777 /nas/cascontrol
+ll
+
+rm -rf /etc/httpd/conf.d/*
+
+sudo yum -y erase httpd mod_ssl
+sudo yum install -y httpd mod_ssl
+
+sudo systemctl enable httpd.service
+sudo systemctl restart httpd
+
+rm -rf ~/.ansible
+rm -rf ~/.sas
+
+sudo rm -rf /opt/sas/viya_*
+sudo rm -rf /opt/sas/spre_*
+
+
+--1 to 3
+
+
+--df -h  hang problem
+
+sudo yum install psmisc -y
+
+--check yum repolist
+yum repolist
+--
+
+
+
+
+
+
+cd /var/run 
+mv utmp utmp_old
+touch  utmp
+
+userdel -r cas
+userdel -r sas
+userdel -r saspgpool
+userdel -r sasrabbitmq
+userdel -r postgres
+userdel -r ldap
+groupdel sas
+
+sudo groupadd -g 2000 sas
+sudo useradd -u 2001 -m sas -g sas
+sudo useradd -u 2002 -m cas -g sas
+
+echo "sas12345" | sudo passwd --stdin sas
+echo "sas12345" | sudo passwd --stdin cas
+
+su -
+visudo
+添加如下行
+sas ALL=(ALL) NOPASSWD: ALL
+---
+--配置ssh
+
+
+su - sas
+ssh-keygen -t rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+chmod 700 -R ~/.ssh
+ssh-copy-id -i ~/.ssh/id_rsa.pub  sas@viya01.sas.spdl.com
+ssh-copy-id -i ~/.ssh/id_rsa.pub  sas@viya02.sas.spdl.com
+
+
+
+sudo pip uninstall urllib3 chardet -y
+sudo pip install requests
+--
+fatal: [cas-worker]: FAILED! => {"changed": false, "msg": "Destination /opt/sas/viya/config/etc/sysconfig/sas-javaesntl/sas-java does not exist !", "rc": 257}
+
+
+echo 1>/sas/sas_viya_playbook/deployment.log 
+ansible-playbook system-assessment.yml -e "@/opt/sas/repomirror/repo_override.txt" 
+
+sudo yum-complete-transaction --cleanup-only
+ansible -i mt2.ini all -a "sudo rpm -e sas-javaesntl-1.1.17-20171114.1510685505098.x86_64 --nodeps"
+time ansible-playbook deploy-cleanup.yml
+
+rpm -qa|grep javaesntl
+ansible -i inventory.ini all -a "sudo rpm -e sas-javaesntl-1.2.9-20180611.1528742355451.x86_64 --nodeps"
+yum reinstall sas-javaesntl -y
+ls -lrt /opt/sas/viya/config/etc/sysconfig/sas-javaesntl/sas-java
+
+
+
+
+```
