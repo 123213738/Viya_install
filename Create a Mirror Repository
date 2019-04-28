@@ -1,0 +1,42 @@
+```bash
+Create a Mirror Repository
+
+wget https://support.sas.com/installation/viya/34/sas-mirror-manager/lax/mirrormgr-linux.tgz
+
+tar -xvf mirrormgr-linux.tgz 
+
+./mirrormgr mirror --deployment-data spdb_viya_19w21_20190423_verified.zip --path ./spdb_viya_19w21_20190423_verified --platform  x64-redhat-linux-6 --latest
+
+
+SAS_Viya_deployment_data_vdmml
+x64-redhat-linux-6
+x64-suse-linux-12
+
+wget https://support.sas.com/installation/viya/34/sas-orchestration-cli/lax/sas-orchestration-linux.tgz
+cd /data/Mirror
+tar -xvf sas-orchestration-linux.tgz
+./sas-orchestration build --input wuxi_viya_19w14_20190415.zip --platform redhat --repository-warehouse "/nas/viyadepot/wuxi_viya_19w14_20190415"
+
+cp SAS_Viya_playbook.tgz /sas/
+
+
+mkdir -p /opt/data/sas
+ln -s /opt/data /data
+ln -s /opt/data/sas /sas
+sudo mkdir -p /opt/saswork
+sudo chmod -R 777 /opt/saswork
+sudo mkdir -p /opt/castmp/
+sudo chmod -R 777 /opt/castmp/
+chmod -R 777 /opt/data
+mkdir -p /opt/repo
+chmod -R 777 /opt/repo
+mkdir /nas
+chmod -R 777 /nas
+
+
+cd /data/
+mkdir -p opt
+chmod -R 777 opt
+ln -s /data/opt /opt
+
+```
