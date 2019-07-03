@@ -1,0 +1,95 @@
+```bash
+cat << 'EOF' >> /opt/sas/viya/config/etc/cas/default/cas_usermods.settings
+unset PYTHONPATH 
+unset PYTHONHOME
+source /home/psas/anaconda3/bin/activate python34
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH#:}
+export PYTHONHOME=$CONDA_PREFIX
+export SITE_PACKAGES=$CONDA_PREFIX/lib/python3.4/site-packages
+export PYTHONPATH=.:$CONDA_PREFIX/lib/python3.4
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/numpy
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/numpy/lib
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/pandas
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/sklearn
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/sklearn/externals/
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/sklearn/externals/joblib/
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/xgboost
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/xgboost/lib
+
+export MAS_PYPATH=$CONDA_PREFIX/bin/python
+export MAS_M2PATH=/opt/sas/viya/home/SASFoundation/misc/embscoreeng/mas2py.py
+EOF
+
+cat << 'EOF' >> /opt/sas/viya/config/etc/sysconfig/microanalyticservice.conf
+unset PYTHONPATH 
+unset PYTHONHOME
+source /home/psas/anaconda3/bin/activate python34
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH#:}
+export PYTHONHOME=$CONDA_PREFIX
+export SITE_PACKAGES=$CONDA_PREFIX/lib/python3.4/site-packages
+export PYTHONPATH=.:$CONDA_PREFIX/lib/python3.4
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/numpy
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/numpy/lib
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/pandas
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/sklearn
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/sklearn/externals/
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/sklearn/externals/joblib/
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/xgboost
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/xgboost/lib
+
+export MAS_PYPATH=$CONDA_PREFIX/bin/python
+export MAS_M2PATH=/opt/sas/viya/home/SASFoundation/misc/embscoreeng/mas2py.py
+EOF
+
+cat << 'EOF' >> /opt/sas/viya/config/etc/sysconfig/compsrv/default/sas-compsrv
+export PATH=/home/psas/anaconda3/envs/python34/bin:${PATH}
+EOF
+
+cat << 'EOF' >> /opt/sas/viya/config/etc/workspaceserver/default/workspaceserver_usermods.sh
+unset PYTHONPATH 
+unset PYTHONHOME
+source /home/psas/anaconda3/bin/activate python34
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CONDA_PREFIX}/lib
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH#:}
+export PYTHONHOME=$CONDA_PREFIX
+export SITE_PACKAGES=$CONDA_PREFIX/lib/python3.4/site-packages
+export PYTHONPATH=.:$CONDA_PREFIX/lib/python3.4
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/numpy
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/numpy/lib
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/pandas
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/sklearn
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/sklearn/externals/
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/sklearn/externals/joblib/
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/xgboost
+export PYTHONPATH=$PYTHONPATH:$SITE_PACKAGES/xgboost/lib
+
+export MAS_PYPATH=$CONDA_PREFIX/bin/python
+export MAS_M2PATH=/opt/sas/viya/home/SASFoundation/misc/embscoreeng/mas2py.py
+EOF
+
+more  /opt/sas/viya/config/etc/cas/default/cas_usermods.settings
+
+more  /opt/sas/viya/config/etc/sysconfig/microanalyticservice.conf 
+
+more  /opt/sas/viya/config/etc/sysconfig/compsrv/default/sas-compsrv
+
+more  /opt/sas/viya/config/etc/workspaceserver/default/workspaceserver_usermods.sh
+
+sudo /etc/init.d/sas-viya-cascontroller-default restart
+sudo /etc/init.d/sas-viya-microanalyticservice-default restart
+
+check cas log
+cd /data/opt/sas/viya/config/var/log/cas/default
+ll -t |head -n 2|awk '{print $9}'|xargs tail -f
+check mas log
+cd /var/log/sas/viya/microanalyticservice/default
+ll -t |head -n 2|awk '{print $9}'|xargs tail -f
+check compsrv log
+cd /opt/sas/viya/config/var/log/compsrv/default
+ll -t |head -n 2|awk '{print $9}'|xargs tail -f
+```
