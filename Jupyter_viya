@@ -1,0 +1,132 @@
+```bash
+vmware-hgfsclient
+yum install -y open-vm-tools
+vmhgfs-fuse .host:/ /mnt/
+
+Anaconda3-5.1.0
+
+----
+cd /etc/yum.repos.d/
+tar -cvf repos.tar *
+mv CentOS-Media.repo bak
+rm -rf *.repo
+mv bak CentOS-Media.repo
+
+vi CentOS-Media.repo 
+
+[c7-media]
+name=CentOS-$releasever - Media
+baseurl=file:///run/media/denny/CentOS\ 7\ x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+----
+
+wget https://repo.anaconda.com/archive/Anaconda3-5.3.1-Linux-x86_64.sh
+
+bash  Anaconda3-5.3.1-Linux-x86_64.sh
+
+yes
+
+vi ~./bashrc
+
+# User specific aliases and functions
+# added by Anaconda3 5.3.1 installer
+# >>> conda init >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$(CONDA_REPORT_ERRORS=false '/data/anaconda/bin/conda' shell.bash hook 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    \eval "$__conda_setup"
+else
+    if [ -f "/data/anaconda/etc/profile.d/conda.sh" ]; then
+        . "/data/anaconda/etc/profile.d/conda.sh"
+        CONDA_CHANGEPS1=false conda activate base
+    else
+        \export PATH="/data/anaconda/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda init <<<
+
+source ~/.bashrc
+
+anaconda-navigator
+
+
+conda list|grep numpy      
+conda list|grep pandas  
+conda list|grep pyspark   
+conda list|grep scikit-learn 
+conda list|grep xgboost
+conda list|grep datetime   
+conda list|grep swat   
+conda list|grep sas-dlpy         
+
+
+--
+cd /data/anaconda/pkgs
+conda install --use-local pytorch-0.4.0-py35_cuda8.0.61_cudnn7.1.2_1.tar.bz2
+---
+conda install scikit-learn
+          
+
+
+sudo yum remove anaconda* -y
+
+conda create --name python37 python=3.7 scikit-learn pandas numpy 
+conda activate python37
+pip install xgboost
+pip install sas-dlpy
+
+conda list|grep numpy      
+conda list|grep pandas   
+conda list|grep scikit-learn 
+conda list|grep xgboost
+conda list|grep swat
+conda list|grep sas-dlpy
+
+pip install https://github.com/sassoftware/python-swat/releases/download/v1.5.0/python-swat-1.5.0-linux64.tar.gz
+
+anaconda-navigator
+
+
+  146  jupyter notebook --generate-config
+  147  ll
+  148  cd .jupyter/
+  149  ll
+  150  more jupyter_notebook_config.py 
+In [1]: from notebook.auth import passwd  
+In [2]: passwd()  
+Enter password:   
+Verify password:   
+Out[2]: 'sha1:da874cad4309:4104089e5ef97c8fcbe69c2ac7d6a1071ca50a40' 
+
+  151    ipython
+  152  vi jupyter_notebook_config.py 
+  
+nohup jupyter notebook &
+
+
+
+
+s = sw.CAS("eeclxvm124.unx.sas.com", 5570, "sas", "sas12345")
+s.sessionprop.setsessopt(caslib='PUBLIC',timeout=3.1536E7)
+s.loadactionset('deeplearn') 
+
+import swat as sw
+import matplotlib
+import numpy as np
+import matplotlib.pyplot as plt 
+
+vi ~/.bashrc
+export CAS_CLIENT_SSL_CA_LIST=/opt/sas/viya/config/etc/SASSecurityCertificateFramework/cacerts/trustedcerts.pem
+source ~/.bashrc
+
+http://eeclxvm124.unx.sas.com:8890/?token=855cb480a412364d28a897873992bc7a2f6983bc6d40a6f4
+
+import swat
+portnumber=5570
+sess = swat.CAS('eeclxvm124.unx.sas.com', portnumber, 'viyademo01', 'sas12345', caslib="casuser")
+print (sess)
+sess.serverstatus()
+```
