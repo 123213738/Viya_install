@@ -1,4 +1,3 @@
-```bash
 vmware-hgfsclient
 yum install -y open-vm-tools
 vmhgfs-fuse .host:/ /mnt/
@@ -129,4 +128,3 @@ portnumber=5570
 sess = swat.CAS('eeclxvm124.unx.sas.com', portnumber, 'viyademo01', 'sas12345', caslib="casuser")
 print (sess)
 sess.serverstatus()
-```
