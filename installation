@@ -1,4 +1,3 @@
-```bash
 [root@viya1 sas]#  md5sum viya34.tar
 7d56ce54ec08edd4aff440b854a180ae  viya34.tar
 7d56ce54ec08edd4aff440b854a180ae  viya34.tar
@@ -239,4 +238,3 @@ s.serverstatus()
 export CAS_CLIENT_SSL_CA_LIST=/opt/sas/viya/config/etc/SASSecurityCertificateFramework/cacerts/trustedcerts.pem
 
 an error occurred requesting the cas management service
-```
