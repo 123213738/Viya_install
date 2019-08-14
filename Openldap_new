@@ -110,3 +110,7 @@ for i in `ls /opt/sas/misc/openldap/users/*.ldif`; do sudo ldapadd -x -D "cn=adm
 You will need to make sure that these users have a home directory.
 su - <userid>
 will log you in as the user and create it. You would have to do that on each machine where you need the home directory to exist.
+
+
+[sas@eeclxvm127 ~]$ ldappasswd -x -h eeclxvm124 -p 389 -D "cn=admin,dc=viya,dc=com" -w pw0809  "uid=viyademo01,ou=users,dc=viya,dc=com"
+New password: jMycsy5D
