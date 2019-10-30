@@ -114,6 +114,35 @@ ansible -i inventory.ini all -a "sudo rpm -e sas-javaesntl-1.2.9-20180611.152874
 yum reinstall sas-javaesntl -y
 ls -lrt /opt/sas/viya/config/etc/sysconfig/sas-javaesntl/sas-java
 
+----total cleanup
+- ansible-playbook deploy-cleanup.yml
+
+- mv deployment.log deployment.log.old
+- remove all remnants with that pattern /opt/sas/viya* /opt/sas/spre*
+
+- rpm -qa 'sas-*'
+
+- yum remove 'sas-*'
+
+- Reboot 
+
+If it is not possible a reboot:
+
+  rm /tmp/* (sas files)
+
+  ps -ef | grep -E 'viya|spre|sas' 
+
+  kill -9 
+- Recreate the certificate:
+ yum remove httpd mod_ssl
+ rm /etc/pki/tls/certs/localhost.crt
+ rm /etc/pki/tls/private/localhost.key
+ rm /etc/pki/tls/certs/localhost.csr
+ yum install httpd mod_ssl
+- Validate certificate 
+ keytool -printcert -file /etc/pki/tls/certs/localhost.crt
+- If certificate suites
+ansible-playbook site.yml -vvvv
 
 
 
