@@ -1,4 +1,3 @@
-```bash
 Create a Mirror Repository
 
 wget https://support.sas.com/installation/viya/34/sas-mirror-manager/lax/mirrormgr-linux.tgz
@@ -7,6 +6,15 @@ tar -xvf mirrormgr-linux.tgz
 
 ./mirrormgr mirror --deployment-data spdb_viya_19w21_20190423_verified.zip --path ./spdb_viya_19w21_20190423_verified --platform  x64-redhat-linux-6 --latest
 
+---windows
+https://support.sas.com/en/documentation/install-center/viya/deployment-tools/35/mirror-manager.html
+ 
+C:\Viya\Tools\mirrormgr.exe list remote platforms --deployment-data C:\Viya\License\ICBC20W26VIYA35V20200629.zip
+
+x64-suse-linux-12
+
+C:\Viya\Tools\mirrormgr.exe mirror --deployment-data C:\Viya\License\ICBC20W26VIYA35V20200629.zip --path C:\Viya\Depots\ICBC20W26VIYA35V20200629\ --platform  x64-suse-linux-12 --latest
+-----
 
 SAS_Viya_deployment_data_vdmml
 x64-redhat-linux-6
@@ -38,5 +46,3 @@ cd /data/
 mkdir -p opt
 chmod -R 777 opt
 ln -s /data/opt /opt
-
-```
